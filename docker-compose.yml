@@ -1,1 +1,18 @@
-
+rabbitmq:
+  container_name: "MessageQueueServer"
+  image: rabbitmq:3-management
+  ports:
+    - "9002:15672"
+    - "5672:5672"
+api:
+  build: api/.
+  container_name: "ApiServer"
+  links:
+    - rabbitmq
+  ports:
+    - "8080:8080"
+  worker:
+  build: worker/.
+  container_name: "Worker"
+  links:
+    - rabbitmq
