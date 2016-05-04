@@ -16,3 +16,10 @@ api:
   container_name: "Worker"
   links:
     - rabbitmq
+    - elasticsearch
+elasticsearch:
+  container_name: "ElasticsearchServer"
+  image: elasticsearch:latest
+  ports:
+    - "19200:9200"
+    - "19300:9300"
