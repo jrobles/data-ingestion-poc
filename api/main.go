@@ -1,5 +1,13 @@
 package main
 
+import (
+	"fmt"
+	"time"
+)
+
 func main() {
-	print("hello")
+	for {
+		time.Sleep(10 * time.Second)
+		fmt.Println("hello")
+	}
 }

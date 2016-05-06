@@ -1,5 +1,12 @@
 package main
 
+import (
+	"time"
+)
+
 func main() {
-	print("hello")
+	for {
+		time.Sleep(100 * time.Second)
+		print("hello")
+	}
 }
