@@ -1,2 +1,2 @@
 #!/bin/bash -ex                                                                                                    
-docker-compose stop; docker-compose rm ; docker-compose build; docker-compose up --force-recreate 
+docker-compose stop; docker-compose rm -f ; docker-compose build; docker-compose up --force-recreate 

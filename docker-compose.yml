@@ -10,10 +10,9 @@ api:
   links:
     - rabbitmq
   ports:
-    - "8080:8080"
+    - "1337:1337"
 worker:
   build: worker/.
-  container_name: "Worker"
   links:
     - rabbitmq
     - elasticsearch
