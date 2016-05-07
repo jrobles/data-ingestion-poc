@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -18,7 +19,7 @@ type Payload struct {
 	Bucket    string `json:"bucket"`
 }
 
-func csvImport(w http.ResponseWriter, r *http.Request) {
+func csvAsync(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintln(w, err)
@@ -36,6 +37,12 @@ func csvImport(w http.ResponseWriter, r *http.Request) {
 
 		localFile := "/tmp/" + file.Filename + "." + file.Extension
 		c := awsConnect(f)
-		awsDownload(c, string(file.Path+"/"+file.Filename+"."+file.Extension), localFile)
+		awsDownload(c, string(file.Path+"/"+file.Filename+"."+file.Extension), localFile, fileQueue)
+	}
+}
+
+func csvAsyncProcessor(ch chan string) {
+	for m := range ch {
+		log.Println("Processing file ", m)
 	}
 }

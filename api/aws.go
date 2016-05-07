@@ -29,7 +29,7 @@ func awsConnect(i *AwsInfo) *s3.Bucket {
 	return connection.Bucket(i.Bucket)
 }
 
-func awsDownload(bucket *s3.Bucket, remoteFile string, localFile string) {
+func awsDownload(bucket *s3.Bucket, remoteFile string, localFile string, ch chan string) {
 
 	downloadBytes, err := bucket.Get(remoteFile)
 	if err != nil {
@@ -49,6 +49,9 @@ func awsDownload(bucket *s3.Bucket, remoteFile string, localFile string) {
 
 			io.Copy(downloadBuffer, downloadFile)
 			log.Printf("%s downloaded to %s", remoteFile, localFile)
+
+			// Queue up the downloaded file for processing
+			ch <- string(localFile)
 		}
 	}
 }
