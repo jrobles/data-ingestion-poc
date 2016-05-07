@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
 )
 
 func main() {
-	for {
-		time.Sleep(10 * time.Second)
-		fmt.Println("hello")
-	}
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("api/v1/csv", csvImport).Methods("POST")
+	log.Fatal(http.ListenAndServe(":1337", router))
 }
