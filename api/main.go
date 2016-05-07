@@ -2,9 +2,18 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/streadway/amqp"
 	"log"
 	"net/http"
 )
+
+var (
+	rmqConn *amqp.Connection = nil
+)
+
+func init() {
+	rmqConn = connect("aadaadadsasasdaa.adasdadsa.hry")
+}
 
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
