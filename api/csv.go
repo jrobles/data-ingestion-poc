@@ -1,11 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 )
 
 // Payload is used to organize the incoming json data
@@ -20,13 +21,13 @@ type Payload struct {
 }
 
 func csvAsync(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
+	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintln(w, err)
 		w.WriteHeader(500)
 	} else {
 		file := Payload{}
-		json.Unmarshal([]byte(body), &file)
+		json.Unmarshal([]byte(b), &file)
 
 		f := &AwsInfo{
 			AccessKey: file.Key,
@@ -43,6 +44,23 @@ func csvAsync(w http.ResponseWriter, r *http.Request) {
 
 func csvAsyncProcessor(ch chan string) {
 	for m := range ch {
-		log.Println("Processing file ", m)
+		f, err := os.Open(m)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer f.Close()
+
+		r := csv.NewReader(f)
+		r.FieldsPerRecord = -1
+		rows, err := r.ReadAll()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		for _, row := range rows {
+			fmt.Println(row)
+		}
+
 	}
 }
