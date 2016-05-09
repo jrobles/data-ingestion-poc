@@ -73,6 +73,7 @@ func csvAsyncProcessor(ch chan string) {
 		// we expect the columns in the very first row
 		columns := rows[0]
 
+		// subslice rows in order to skip the first row (the columns)
 		for _, row := range rows[1 : len(rows)] {
 			jsonRow, err := createRowToJson(columns, row)
 
