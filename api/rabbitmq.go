@@ -17,7 +17,7 @@ func connect(amqpURI string) (ch *amqp.Connection) {
 	}
 }
 
-func publish(connection *amqp.Connection, exchange, queue, routingKey, body string, reliable bool) error {
+func publish(connection *amqp.Connection, exchange, queue, body string, reliable bool) error {
 
 	ch, err := connection.Channel()
 	if err != nil {
@@ -50,7 +50,7 @@ func publish(connection *amqp.Connection, exchange, queue, routingKey, body stri
 
 				err = ch.QueueBind(
 					q.Name, // queue name
-					routingKey,
+					queue,
 					exchange, // exchange
 					false,
 					nil,
