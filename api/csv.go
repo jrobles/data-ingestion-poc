@@ -58,6 +58,12 @@ func csvAsyncProcessor(ch chan string) {
 			os.Exit(1)
 		}
 
+		// Map with header row values..need a better solution here.
+		m := make(map[string]string)
+		for _, v := range rows[0] {
+			m[v] = ""
+		}
+
 		for _, row := range rows {
 			fmt.Println(row)
 		}
