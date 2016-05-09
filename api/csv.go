@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 )
@@ -70,6 +71,8 @@ func csvAsyncProcessor(ch chan string) {
 			os.Exit(1)
 		}
 
+		fmt.Printf("Processing %s with %d rows", f, len(rows))
+
 		// we expect the columns in the very first row
 		columns := rows[0]
 
@@ -80,8 +83,11 @@ func csvAsyncProcessor(ch chan string) {
 			if err != nil {
 				log.Println(err)
 			} else {
-				// TODO ::: instead of print send it to rabbitmq
-				fmt.Printf("%s\n", json)
+				err := publish(rmqConn, "ClientFeedsExchange", "ClientFeedsQueue", "records", string(json), true)
+				if err != nil {
+					log.Println(err)
+				}
+
 			}
 		}
 
