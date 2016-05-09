@@ -42,6 +42,18 @@ func csvAsync(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// createRowToJson receives a column slice and a values slice, then match each column-value and tries to output a json
+func createRowToJson(columns []string, values[]string) ([]byte, error) {
+	// create a map using exactly the values' length
+	mp := make(map[string]string, len(values))
+
+	for i, v := range(values) {
+		mp[columns[i]] = v
+	}
+
+	return json.Marshal(mp)
+}
+
 func csvAsyncProcessor(ch chan string) {
 	for m := range ch {
 		f, err := os.Open(m)
@@ -58,14 +70,19 @@ func csvAsyncProcessor(ch chan string) {
 			os.Exit(1)
 		}
 
-		// Map with header row values..need a better solution here.
-		m := make(map[string]string)
-		for _, v := range rows[0] {
-			m[v] = ""
-		}
+		// we expect the columns in the very first row
+		columns := rows[0]
 
-		for _, row := range rows {
-			fmt.Println(row)
+		// subslice rows in order to skip the first row (the columns)
+		for _, row := range rows[1 : len(rows)] {
+			jsonRow, err := createRowToJson(columns, row)
+
+			if err != nil {
+				// whatever you do once you get an error
+			} else {
+				// TODO ::: instead of print send it to rabbitmq
+				fmt.Printf("%s\n", jsonRow)
+			}
 		}
 
 	}

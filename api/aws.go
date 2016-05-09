@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"io"
-	"launchpad.net/goamz/aws"
-	"launchpad.net/goamz/s3"
+	"github.com/goamz/goamz/aws"
+	"github.com/goamz/goamz/s3"
 	"log"
 	"os"
 )
