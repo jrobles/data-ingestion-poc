@@ -42,12 +42,12 @@ func csvAsync(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// createRowToJson receives a column slice and a values slice, then match each column-value and tries to output a json
-func createRowToJson(columns []string, values[]string) ([]byte, error) {
+// createRowToJson receives a column slice and a values slice, then matches each column-value and outputs json
+func createRowToJson(columns []string, values []string) ([]byte, error) {
 	// create a map using exactly the values' length
 	mp := make(map[string]string, len(values))
 
-	for i, v := range(values) {
+	for i, v := range values {
 		mp[columns[i]] = v
 	}
 
@@ -74,14 +74,14 @@ func csvAsyncProcessor(ch chan string) {
 		columns := rows[0]
 
 		// subslice rows in order to skip the first row (the columns)
-		for _, row := range rows[1 : len(rows)] {
-			jsonRow, err := createRowToJson(columns, row)
+		for _, row := range rows[1:len(rows)] {
+			json, err := createRowToJson(columns, row)
 
 			if err != nil {
-				// whatever you do once you get an error
+				log.Println(err)
 			} else {
 				// TODO ::: instead of print send it to rabbitmq
-				fmt.Printf("%s\n", jsonRow)
+				fmt.Printf("%s\n", json)
 			}
 		}
 
