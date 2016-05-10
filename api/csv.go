@@ -83,7 +83,7 @@ func csvAsyncProcessor(ch chan string) {
 			if err != nil {
 				log.Println(err)
 			} else {
-				err := publish(rmqConn, "ClientFeedsExchange", "records", string(json), true)
+				err := publish(rmqConn, os.Getenv("MESSAGEQUEUESERVER_EXCHANGE"), os.Getenv("MESSAGEQUEUESERVER_QUEUE"), string(json), true)
 				if err != nil {
 					log.Println(err)
 				}

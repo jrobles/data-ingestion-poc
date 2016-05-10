@@ -6,6 +6,7 @@ rabbitmq:
     - "5672:5672"
 api:
   build: api/.
+  env_file: .env
   container_name: "ApiServer"
   links:
     - rabbitmq
@@ -13,6 +14,7 @@ api:
     - "1337:1337"
 worker:
   build: worker/.
+  env_file: .env
   links:
     - rabbitmq
     - elasticsearch

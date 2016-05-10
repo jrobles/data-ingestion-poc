@@ -88,6 +88,8 @@ func publish(connection *amqp.Connection, exchange, queue, body string, reliable
 						},
 					); err != nil {
 						return fmt.Errorf("Exchange Publish: %s", err)
+					} else {
+						ch.Close()
 					}
 
 				}
