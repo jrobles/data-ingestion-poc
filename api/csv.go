@@ -21,6 +21,10 @@ type Payload struct {
 	Bucket    string `json:"bucket"`
 }
 
+const (
+	createRowToJSONErrorMismatchLength = "Column's length must be, at least, equal to values' length"
+)
+
 func csvAsync(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -43,8 +47,13 @@ func csvAsync(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// createRowToJson receives a column slice and a values slice, then matches each column-value and outputs json
-func createRowToJson(columns []string, values []string) ([]byte, error) {
+// createRowToJSON receives a column slice and a values slice, then matches each column-value and outputs json
+func createRowToJSON(columns []string, values []string) ([]byte, error) {
+
+	if len(columns) < len(values) {
+		return nil, fmt.Errorf(createRowToJSONErrorMismatchLength)
+	}
+
 	// create a map using exactly the values' length
 	mp := make(map[string]string, len(values))
 
@@ -78,7 +87,7 @@ func csvAsyncProcessor(ch chan string) {
 
 		// subslice rows in order to skip the first row (the columns)
 		for _, row := range rows[1:len(rows)] {
-			json, err := createRowToJson(columns, row)
+			json, err := createRowToJSON(columns, row)
 
 			if err != nil {
 				log.Println(err)
