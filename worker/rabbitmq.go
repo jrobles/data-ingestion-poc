@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/streadway/amqp"
 	"log"
 )
@@ -96,7 +95,9 @@ func consume(conn *amqp.Connection, exchange, queue, consumerTag string) error {
 					go func() {
 						for d := range msgs {
 							d.Ack(false)
-							fmt.Println(string(d.Body))
+
+							// Dropped in here for now but need to push d.Body to a channel
+							err = indexData(string(d.Body))
 						}
 					}()
 					log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
