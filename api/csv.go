@@ -10,6 +10,10 @@ import (
 	"os"
 )
 
+const (
+	createRowToJSONErrorMismatchLength = "ERROR: Column's length must be, at least, equal to values' length"
+)
+
 // Payload is used to organize the incoming json data
 type Payload struct {
 	Filename  string `json:"filename"`
@@ -21,14 +25,10 @@ type Payload struct {
 	Bucket    string `json:"bucket"`
 }
 
-const (
-	createRowToJSONErrorMismatchLength = "Column's length must be, at least, equal to values' length"
-)
-
 func csvAsync(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintln(w, err)
+		log.Printf("ERROR: Could not read POST data - %s", err)
 		w.WriteHeader(500)
 	} else {
 		file := Payload{}
@@ -68,7 +68,7 @@ func csvAsyncProcessor(ch chan string) {
 	for m := range ch {
 		f, err := os.Open(m)
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("ERROR: Could not open %s file - %s", m, err)
 		}
 		defer f.Close()
 
@@ -76,11 +76,9 @@ func csvAsyncProcessor(ch chan string) {
 		r.FieldsPerRecord = -1
 		rows, err := r.ReadAll()
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("ERROR: Could not read csv rows - %s", err)
 			os.Exit(1)
 		}
-
-		fmt.Printf("Processing %s with %d rows", f, len(rows))
 
 		// we expect the columns in the very first row
 		columns := rows[0]
@@ -88,17 +86,14 @@ func csvAsyncProcessor(ch chan string) {
 		// subslice rows in order to skip the first row (the columns)
 		for _, row := range rows[1:len(rows)] {
 			json, err := createRowToJSON(columns, row)
-
 			if err != nil {
-				log.Println(err)
+				log.Printf("ERROR: Could not join row with header - %s", err)
 			} else {
 				err := publish(rmqConn, os.Getenv("MESSAGEQUEUESERVER_EXCHANGE"), os.Getenv("MESSAGEQUEUESERVER_QUEUE"), string(json), true)
 				if err != nil {
-					log.Println(err)
+					log.Printf("ERROR: Could not publish message '%s' - %s", string(json), err)
 				}
-
 			}
 		}
-
 	}
 }

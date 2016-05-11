@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
-	. "gopkg.in/check.v1"
 	"fmt"
+	. "gopkg.in/check.v1"
+	"testing"
 )
 
 // Hook up gocheck into the "go test" runner.

@@ -2,9 +2,9 @@ package main
 
 import (
 	"bufio"
-	"io"
 	"github.com/goamz/goamz/aws"
 	"github.com/goamz/goamz/s3"
+	"io"
 	"log"
 	"os"
 )

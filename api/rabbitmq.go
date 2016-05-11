@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/streadway/amqp"
 	"log"
 )
@@ -17,11 +16,13 @@ func connect(amqpURI string) (ch *amqp.Connection) {
 	}
 }
 
+// Not a fan of this func, I want to write a lib to handle all rmq actions...
 func publish(connection *amqp.Connection, exchange, queue, body string, reliable bool) error {
 
 	ch, err := connection.Channel()
 	if err != nil {
-		return fmt.Errorf("Channel: %s", err)
+		log.Printf("ERROR: Could not create channel - %s", err)
+		return err
 	} else {
 
 		if err := ch.ExchangeDeclare(
@@ -33,7 +34,8 @@ func publish(connection *amqp.Connection, exchange, queue, body string, reliable
 			false,    // noWait
 			nil,      // arguments
 		); err != nil {
-			return fmt.Errorf("Exchange Declare: %s", err)
+			log.Printf("ERROR: Could not declare exchange '%s' - %s", exchange, err)
+			return err
 		} else {
 
 			q, err := ch.QueueDeclare(
@@ -45,7 +47,8 @@ func publish(connection *amqp.Connection, exchange, queue, body string, reliable
 				nil,   // arguments
 			)
 			if err != nil {
-				return fmt.Errorf("Queue Declare: %s", err)
+				log.Printf("ERROR: Could not declare queue '%s' - %s", queue, err)
+				return err
 			} else {
 
 				err = ch.QueueBind(
@@ -56,15 +59,15 @@ func publish(connection *amqp.Connection, exchange, queue, body string, reliable
 					nil,
 				)
 				if err != nil {
-					log.Printf("ERROR: Could not bind [%s] queue to [%s] exhange %q", q.Name, exchange, err)
+					log.Printf("ERROR: Could not bind queue '%s' to exchange '%s' using '%s'", queue, exchange, queue, err)
 					return err
 				} else {
 
-					// Reliable publisher confirms require confirm.select support from the
-					// connection.
+					// Reliable publisher confirms require confirm.select support from to connection.
 					if reliable {
 						if err := ch.Confirm(false); err != nil {
-							return fmt.Errorf("Channel could not be put into confirm mode: %s", err)
+							log.Printf("ERROR: Could not confirm - %s", err)
+							return err
 						}
 
 						confirms := ch.NotifyPublish(make(chan amqp.Confirmation, 1))
@@ -87,7 +90,8 @@ func publish(connection *amqp.Connection, exchange, queue, body string, reliable
 							// a bunch of application/implementation-specific fields
 						},
 					); err != nil {
-						return fmt.Errorf("Exchange Publish: %s", err)
+						log.Printf("ERROR: Could not publish message %s", err)
+						return err
 					} else {
 						ch.Close()
 					}
