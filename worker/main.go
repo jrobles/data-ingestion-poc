@@ -38,16 +38,17 @@ func indexData(body string) error {
 	b := []byte(body)
 	err := json.Unmarshal(b, &objmap)
 	if err != nil {
-		log.Printf("ERROR: %q", err)
+		log.Printf("ERROR: Could not unmarshal message - %s", err)
 	}
 
+	// Can't hard-code the unique identifier, works for POC but needs to be fixed
 	err = json.Unmarshal(*objmap["Item Number"], &pid)
 	if err != nil {
-		log.Printf("ERROR: %q", err)
+		log.Printf("ERROR: Coulnd not unarhal Item Number -  %s", err)
 	}
 	_, err = c.Index("spacely_sprockets", "products", pid, nil, body)
 	if err != nil {
-		log.Printf("ERROR: %q", err)
+		log.Printf("ERROR: Could not index into elasticsearch %s", err)
 	}
 
 	return nil

@@ -10,10 +10,6 @@ import (
 	"os"
 )
 
-const (
-	createRowToJSONErrorMismatchLength = "ERROR: Column's length must be, at least, equal to values' length"
-)
-
 // Payload is used to organize the incoming json data
 type Payload struct {
 	Filename  string `json:"filename"`
@@ -51,7 +47,7 @@ func csvAsync(w http.ResponseWriter, r *http.Request) {
 func createRowToJSON(columns []string, values []string) ([]byte, error) {
 
 	if len(columns) < len(values) {
-		return nil, fmt.Errorf(createRowToJSONErrorMismatchLength)
+		return nil, fmt.Errorf("ERROR: Column's length must be, at least, equal to values' length")
 	}
 
 	// create a map using exactly the values' length
