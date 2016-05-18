@@ -24,7 +24,7 @@ Assuming the Item Number column had a value of 44870, the data can be obtained f
 curl -X GET "http://{YOUR_DOCKER_MACHINE_IP}:19200/{index}/{type}/_search?q=Item\ Number:440870"
 ```
 yields:
-```
+```json
 {
   "took": 17,
   "timed_out": false,
